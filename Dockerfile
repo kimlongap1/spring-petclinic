@@ -6,6 +6,8 @@ ENTRYPOINT ["java","-jar","/spring-petclinic-2.5.0-SNAPSHOT.jar" ,"-Dspring-boot
 
  
 #delete all local image with kimlongap : docker rmi -f $(docker images -a | grep kimlongap |  awk {'print $3'})
+#delete all container : docker rm -vf $(docker ps -a -q)
+#login to container : docker exec -it <container name> /bin/bash 
 
 ### build image & pust to docker repo
 # docker build -t kimlongap/dockertest01:spring-petclinic .
@@ -14,4 +16,3 @@ ENTRYPOINT ["java","-jar","/spring-petclinic-2.5.0-SNAPSHOT.jar" ,"-Dspring-boot
 ### run docker 
 # docker run --name spring-petclinic --rm --publish 8220:8220 kimlongap/dockertest01:spring-petclinic
 
-#login to container : docker exec -it <container name> /bin/bash 

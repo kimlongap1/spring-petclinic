@@ -1,0 +1,89 @@
+pipeline {
+    agent any
+    parameters {
+            string(name:'VERSION', defaultValue:'1.0.0', description:'Version number for this build (x.x.x) - Will add in BUILD-NUMBER automatically.')
+             
+    }
+    tools {
+        // Install the Maven version configured as "M3" and add it to the path.
+        maven 'maven-in-jenkin'
+      
+    }
+    environment {
+        NEXUS_REPO_URL = 'http://192.168.1.7:8081' //without / in the end
+        USERNAME = 'admin'
+        PASSWORD = 'admin123'
+        REPO_NAME = 'ocb'
+        ARTIFACT_PRICE_ID = 'price-service'
+        ARTIFACT_PRODUCT_ID = 'product-service'
+        GROUP_ID = 'com.example.k8sdemo'
+       
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                echo 'check out code '
+                dir('spring-pet-clinic-workspace/') {
+                            git branch: 'main',
+                                credentialsId: '42e0f3d0-bebd-40f6-93ca-0283c07c1481',
+                                url: 'https://github.com/kimlongap1/spring-petclinic.git'
+                            script {
+                                echo 'build pet clinic service  '
+                                
+                                sh 'mvn clean install -DskipTests=true'
+                         
+ 
+                                 
+                            }
+                }
+            }
+        }
+
+   
+        stage('Build docker file') {
+                    steps {
+                        echo 'build docker file  '
+                        
+                        sh 'cd spring-pet-clinic-workspace && docker-compose build '
+                          
+                        }
+                    post {
+                        success {
+                            echo 'build docker file successful '
+                    
+                        }
+                    }
+        }  
+        stage('run docker compose') {
+                    steps {
+                        sh 'cd spring-pet-clinic-workspace && docker-compose stop '
+                        echo 'start docker file  '
+                        sh 'cd spring-pet-clinic-workspace && docker-compose up -d'
+                          
+                        }
+                    post {
+                        success {
+                            echo 'run docker compose successful. please access localhost:8220 '
+                    
+                        }
+                    }
+        }         
+        stage('upload docker to Docker hub  ') {
+                    steps {
+                        echo 'upload product service to docker hub '
+              //          sh 'docker push kimlongap/dockertest01:product-service '
+                         echo 'upload price service to docker hub'
+                 //       sh 'docker push kimlongap/dockertest01:price-service '
+                        
+                        }
+                    post {
+                        success {
+                            echo 'upload docker file successful '
+                    
+                        }
+                    }
+        }
+
+    }
+}
