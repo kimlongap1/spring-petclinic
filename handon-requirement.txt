@@ -1,0 +1,8 @@
+1. config docker for project
+- docker 
+- docker swam
+2. Config Jenkin project 
+Stages
+- get source, compile , test, package 
+- deploy to docker compose
+- deploy to minikube
