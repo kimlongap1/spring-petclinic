@@ -10,8 +10,8 @@ pipeline {
       
     }
     environment {
-        NEXUS_REPO_URL = 'http://192.168.1.7:8081' //without / in the end
-        USERNAME = 'admin'
+     //   NEXUS_REPO_URL = 'https://192.168.1.7:8081' //without / in the end
+     //   USERNAME = 'admin'
         PASSWORD = 'admin123'
         REPO_NAME = 'ocb'
         ARTIFACT_PRICE_ID = 'price-service'
