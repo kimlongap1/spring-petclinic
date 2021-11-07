@@ -56,10 +56,62 @@ ADD  src/main/resources/application.properties  my-application.properties
 EXPOSE 8221
 ENTRYPOINT ["java","-jar","/spring-petclinic-2.5.0-SNAPSHOT.jar" ,"-Dspring-boot.run.profiles=mysql"]
 ``` 
+To build docker image, run this command
+```
+docker build -t kimlongap/dockertest01:spring-petclinic .
+```
+to manually run docker
+first , you need to run mysql first 
+```
+docker run -e MYSQL_USER=petclinic -e MYSQL_PASSWORD=petclinic -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=petclinic -p 3306:3306 mysql:5.7.8
+```
+then run spring-petclinic which is created by build command before 
+```
+docker run --name spring-petclinic --rm --publish 8220:8220 kimlongap/dockertest01:spring-petclinic
+```
 ### Docker compose
+For easier to run database and web service together, we can use docker compose. 
+To run docker compose, we create a new file call docker-compose.yml that put 2 service : web service and database service 
+```
+version: "3.9"
+services:
+  app-db:
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+      - MYSQL_USER=petclinic
+      - MYSQL_PASSWORD=petclinic
+      - MYSQL_DATABASE=petclinic
+    volumes:
+      - "./conf.d:/etc/mysql/conf.d:ro"
+    healthcheck:
+        test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+        timeout: 20s
+        retries: 10      
 
+  web:
+    build: .
+    image: kimlongap/dockertest01:spring-petclinic
+    ports:
+      - "8220:8220"
+    volumes:
+      - .:/code
+    environment:
+      MYSQL_URL: jdbc:mysql://app-db/petclinic
+    depends_on:
+      - app-db
+        
+```
+Pet Clinic supported mysql already so that we just need to create a mysql servic from mysql 5.7 image (public from docker hub)
+remember to link web service to database service via enviroment MYSQL_URL: jdbc:mysql://app-db/petclinic
 ### Docker with k8s
-
+If you want to run these services on k8s, you can use config in k8s-config/java-apps-deployment.yaml
+```
+kubectl apply -f k8s-config/java-apps-deployment.yaml
+```
 ## Working with Petclinic in your IDE
 
 ### Prerequisites
