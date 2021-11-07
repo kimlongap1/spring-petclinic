@@ -45,6 +45,20 @@ docker run -e MYSQL_USER=petclinic -e MYSQL_PASSWORD=petclinic -e MYSQL_ROOT_PAS
 ```
 
 Further documentation is provided [here](https://github.com/spring-projects/spring-petclinic/blob/main/src/main/resources/db/mysql/petclinic_db_setup_mysql.txt).
+## Docker with Petclinic
+### Docker file
+To catch up with docker trennd, we can config Docker file to make Pet clinic program become containerlize
+This is very simple by create a Dockerfile that support Java 
+```
+FROM openjdk:11.0.7-jre-slim-buster
+ADD  target/spring-petclinic-2.5.0-SNAPSHOT.jar  spring-petclinic-2.5.0-SNAPSHOT.jar
+ADD  src/main/resources/application.properties  my-application.properties
+EXPOSE 8221
+ENTRYPOINT ["java","-jar","/spring-petclinic-2.5.0-SNAPSHOT.jar" ,"-Dspring-boot.run.profiles=mysql"]
+``` 
+### Docker compose
+
+### Docker with k8s
 
 ## Working with Petclinic in your IDE
 
